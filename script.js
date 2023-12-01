@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             button.innerHTML = simulators[i];
             button.id = simulators[i];
             button.setAttribute("style", "background: " + colors[i] + ";");
+            button.setAttribute("class", "xkcd-script");
             buttons_div.appendChild(button);
         }
         // create SVG graph
