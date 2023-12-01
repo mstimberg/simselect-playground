@@ -123,10 +123,10 @@ function mark_buttons(x, y, coords) {
         svg_ids = coords[simulators[i]].ids;
         if (fits) {
             stroke_width = 3;
-            sim_button.setAttribute("class","active");
+            sim_button.setAttribute("class","xkcd-script active");
         } else {
             stroke_width = 1;
-            sim_button.setAttribute("class","");
+            sim_button.setAttribute("class","xkcd-script");
         }
         svg_ids.forEach(function(id) {
             rect = document.getElementById(id);
@@ -138,7 +138,7 @@ function mark_buttons(x, y, coords) {
 function reset_buttons() {
     for (let i = 0; i < simulators.length; i++) {
         sim_button = document.getElementById(simulators[i]);
-        sim_button.setAttribute("class","");
+        sim_button.setAttribute("class","xkcd-script");
         svg_ids = all_coords[simulators[i]].ids;
         svg_ids.forEach(function(id) {
             rect = document.getElementById(id);
@@ -175,6 +175,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             text.setAttribute("x", (i+1)*colsize);
             text.setAttribute("y", height - bio_levels.length*20 + i*20);
             text.setAttribute("text-anchor", "middle");
+            text.setAttribute("font-family", "xkcd-script");
             textNode= document.createTextNode(bio_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
@@ -184,6 +185,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             text = document.createElementNS('http://www.w3.org/2000/svg', "text");
             text.setAttribute("y", (i + 1)*rowsize);
             text.setAttribute("x", width - 150);
+            text.setAttribute("font-family", "xkcd-script");
             textNode= document.createTextNode(comp_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
