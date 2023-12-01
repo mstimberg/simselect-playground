@@ -3,8 +3,12 @@ const simulators = ["ANNarchy", "Arbor", "Brian", "Genesis", "GeNN",
 const bio_levels = ["Population Model", "Single-Compartment (Simple) Model",
                     "Single-Compartment (Complex) Model", "Multi-Compartment Model"]
 const comp_levels = ["GPU", "Single Machine", "Cluster", "Supercomputer"];
-
 const colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00'];
+
+const width = 1024;
+const colsize = (width - 150) / (bio_levels.length + 1);
+const height = 600;
+const rowsize = (height - bio_levels.length*20) / (comp_levels.length + 1);
 
 function parse_file(simulator) {
     const directory = "data/";
@@ -79,10 +83,10 @@ function draw_rectangle(sim_idx, coords, svg) {
         for (let j = 0; j < coords.starts_y.length; j++) {
             counter += 1;
             rect = document.createElementNS('http://www.w3.org/2000/svg', "rect");
-            rect.setAttribute("x", (coords.starts_x[i] - 0.5)*50 + sim_idx*2);
-            rect.setAttribute("y", (coords.starts_y[j] - 0.5)*50 + sim_idx*2);
-            rect.setAttribute("width", (coords.ends_x[i] - coords.starts_x[i] + 1)*50);
-            rect.setAttribute("height", (coords.ends_y[j] - coords.starts_y[j] + 1)*50);
+            rect.setAttribute("x", (coords.starts_x[i] - 0.5)*colsize + sim_idx*2);
+            rect.setAttribute("y", (coords.starts_y[j] - 0.5)*rowsize + sim_idx*2);
+            rect.setAttribute("width", (coords.ends_x[i] - coords.starts_x[i] + 1)*colsize);
+            rect.setAttribute("height", (coords.ends_y[j] - coords.starts_y[j] + 1)*rowsize);
             rect.setAttribute("rx", 10);
             rect.setAttribute("ry", 10);
             rect.setAttribute("stroke-width", "1");
@@ -99,7 +103,7 @@ function draw_rectangle(sim_idx, coords, svg) {
 
 function mark_buttons(x, y, coords) {
     console.log(x, y);
-    if (x < 0.5*25 || x > (bio_levels.length + 0.5)*50 || y < 0.5*25 || y > (comp_levels.length + 0.5)*50) {
+    if (x < 0.5*colsize/2 || x > (bio_levels.length + 0.5)*colsize || y < 0.5*rowsize/2 || y > (comp_levels.length + 0.5)*rowsize) {
         reset_buttons();
         return;
     }
@@ -108,8 +112,8 @@ function mark_buttons(x, y, coords) {
         let fits = false;
         for (let j = 0; j < sim_coords.starts_x.length; j++) {
             for (let k=0; k < sim_coords.starts_y.length; k++) {
-                if (x/50 >= sim_coords.starts_x[j]-0.5 && x/50 <= sim_coords.ends_x[j]+0.5 &&
-                    y/50 >= sim_coords.starts_y[k]-0.5 && y/50 <= sim_coords.ends_y[k]+0.5) {
+                if (x/colsize >= sim_coords.starts_x[j]-0.5 && x/colsize <= sim_coords.ends_x[j]+0.5 &&
+                    y/rowsize >= sim_coords.starts_y[k]-0.5 && y/rowsize <= sim_coords.ends_y[k]+0.5) {
                     fits = true;
                     break;
                 }
@@ -157,10 +161,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
         // create SVG graph
         let graph_div = document.getElementById("graph");
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("width", "800");
-        svg.setAttribute("height", "500");
-        svg.setAttribute("viewBox", "0 0 250 350");
-        console.log(descriptions);
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
         all_coords = {};
         simulators.forEach(function(simulator, idx) {
             coords = calc_rectangle(descriptions[simulator]);
@@ -170,8 +172,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         
         for (let i = 0; i < bio_levels.length; i++) {
             text = document.createElementNS('http://www.w3.org/2000/svg', "text");
-            text.setAttribute("x", (i + 0.5)*50);
-            text.setAttribute("y", 250 + i*20);
+            text.setAttribute("x", (i+1)*colsize);
+            text.setAttribute("y", height - bio_levels.length*20 + i*20);
+            text.setAttribute("text-anchor", "middle");
             textNode= document.createTextNode(bio_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
@@ -179,8 +182,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
         
         for (let i = 0; i < comp_levels.length; i++) {
             text = document.createElementNS('http://www.w3.org/2000/svg', "text");
-            text.setAttribute("y", (i + 0.5)*50 + 25);
-            text.setAttribute("x", 250);
+            text.setAttribute("y", (i + 1)*rowsize);
+            text.setAttribute("x", width - 150);
             textNode= document.createTextNode(comp_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
