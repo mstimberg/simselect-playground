@@ -76,22 +76,17 @@ function calc_rectangle(description) {
             'starts_y': starts_y, 'ends_y': ends_y};
 }
 
-function draw_rectangle(sim_idx, coords, svg) {
+function draw_rectangle(sim_idx, coords, svg, rc) {
     ids = [];
     counter = 0;
     for (let i = 0; i < coords.starts_x.length; i++) {
         for (let j = 0; j < coords.starts_y.length; j++) {
             counter += 1;
-            rect = document.createElementNS('http://www.w3.org/2000/svg', "rect");
-            rect.setAttribute("x", (coords.starts_x[i] - 0.5)*colsize + sim_idx*2);
-            rect.setAttribute("y", (coords.starts_y[j] - 0.5)*rowsize + sim_idx*2);
-            rect.setAttribute("width", (coords.ends_x[i] - coords.starts_x[i] + 1)*colsize);
-            rect.setAttribute("height", (coords.ends_y[j] - coords.starts_y[j] + 1)*rowsize);
-            rect.setAttribute("rx", 10);
-            rect.setAttribute("ry", 10);
-            rect.setAttribute("stroke-width", "1");
-            rect.setAttribute("fill", "transparent");
-            rect.setAttribute("stroke", colors[sim_idx])
+            rect = rc.rectangle((coords.starts_x[i] - 0.5)*colsize,
+                                (coords.starts_y[j] - 0.5)*rowsize,
+                                (coords.ends_x[i] - coords.starts_x[i] + 1)*colsize,
+                                (coords.ends_y[j] - coords.starts_y[j] + 1)*rowsize,
+                                {stroke: colors[sim_idx], strokeWidth: 2, roughness: 5.0, fill: "transparent"});
             id = simulators[sim_idx] + "_" + counter
             rect.setAttribute("id", id);
             ids.push(id);
@@ -122,15 +117,17 @@ function mark_buttons(x, y, coords) {
         sim_button = document.getElementById(simulators[i]);
         svg_ids = coords[simulators[i]].ids;
         if (fits) {
-            stroke_width = 3;
+            stroke_width = 4;
             sim_button.setAttribute("class","xkcd-script active");
         } else {
-            stroke_width = 1;
+            stroke_width = 2;
             sim_button.setAttribute("class","xkcd-script");
         }
         svg_ids.forEach(function(id) {
-            rect = document.getElementById(id);
-            rect.setAttribute("stroke-width", stroke_width);
+            for (child of document.getElementById(id).children) {
+               if (parseFloat(child.getAttribute("stroke-width")) > 1)
+                 child.setAttribute("stroke-width", stroke_width);
+            }
         });
     }
 }
@@ -161,12 +158,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
         // create SVG graph
         let graph_div = document.getElementById("graph");
         let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const rc = rough.svg(svg);
         svg.setAttribute("width", width);
         svg.setAttribute("height", height);
         all_coords = {};
         simulators.forEach(function(simulator, idx) {
             coords = calc_rectangle(descriptions[simulator]);
-            ids = draw_rectangle(idx, coords, svg);
+            ids = draw_rectangle(idx, coords, svg, rc);
             all_coords[simulator] = {'coords': coords, 'ids': ids};
         });
         
@@ -176,6 +174,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             text.setAttribute("y", height - bio_levels.length*20 + i*20);
             text.setAttribute("text-anchor", "middle");
             text.setAttribute("font-family", "xkcd-script");
+            text.setAttribute("font-size", "150%");
             textNode= document.createTextNode(bio_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
@@ -186,6 +185,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
             text.setAttribute("y", (i + 1)*rowsize);
             text.setAttribute("x", width - 150);
             text.setAttribute("font-family", "xkcd-script");
+            text.setAttribute("font-size", "150%");
             textNode= document.createTextNode(comp_levels[i]);
             text.appendChild(textNode);
             svg.appendChild(text);
