@@ -89,6 +89,7 @@ function draw_rectangle(sim_idx, coords, svg, rc) {
                                 {stroke: colors[sim_idx], strokeWidth: 2, roughness: 5.0, fill: "transparent"});
             id = simulators[sim_idx] + "_" + counter
             rect.setAttribute("id", id);
+            rect.setAttribute("stroke-opacity", 0.3);
             ids.push(id);
             svg.appendChild(rect);
         }
@@ -96,40 +97,55 @@ function draw_rectangle(sim_idx, coords, svg, rc) {
     return ids;
 }
 
-function mark_buttons(x, y, coords) {
+function on_graph_hover(x, y, coords) {
     if (x < 0.5*colsize/2 || x > (bio_levels.length + 0.5)*colsize || y < 0.5*rowsize/2 || y > (comp_levels.length + 0.5)*rowsize) {
-        reset_buttons();
-        return;
-    }
-    for (let i = 0; i < simulators.length; i++) {
-        sim_coords = coords[simulators[i]].coords;
-        let fits = false;
-        for (let j = 0; j < sim_coords.starts_x.length; j++) {
-            for (let k=0; k < sim_coords.starts_y.length; k++) {
-                if (x/colsize >= sim_coords.starts_x[j]-0.5 && x/colsize <= sim_coords.ends_x[j]+0.5 &&
-                    y/rowsize >= sim_coords.starts_y[k]-0.5 && y/rowsize <= sim_coords.ends_y[k]+0.5) {
-                    fits = true;
-                    break;
+        simulators.forEach(function(sim) {
+                mark_button(sim, coords[sim].ids, false);
+        });
+    } else {
+        for (let i = 0; i < simulators.length; i++) {
+            const simulator = simulators[i];
+            sim_coords = coords[simulator].coords;
+            let fits = false;
+            for (let j = 0; j < sim_coords.starts_x.length; j++) {
+                for (let k=0; k < sim_coords.starts_y.length; k++) {
+                    if (x/colsize >= sim_coords.starts_x[j]-0.5 && x/colsize <= sim_coords.ends_x[j]+0.5 &&
+                        y/rowsize >= sim_coords.starts_y[k]-0.5 && y/rowsize <= sim_coords.ends_y[k]+0.5) {
+                        fits = true;
+                        break;
+                    }
                 }
             }
+            svg_ids = coords[simulator].ids;
+            mark_button(simulator, coords[simulator].ids, fits);
         }
-        sim_button = document.getElementById(simulators[i]);
-        svg_ids = coords[simulators[i]].ids;
-        if (fits) {
-            stroke_width = 4;
-            sim_button.setAttribute("class","xkcd-script active");
-        } else {
-            stroke_width = 2;
-            sim_button.setAttribute("class","xkcd-script");
-        }
-        const alpha = fits ? 1.0 : 0.2;
-        svg_ids.forEach(function(id) {
-            for (child of document.getElementById(id).children) {
-                 if (child.getAttribute("stroke") != "transparent")
-                    child.setAttribute("stroke-opacity", alpha);
-            }
-        });
     }
+}
+
+function on_button_hover(simulator, coords) {
+    simulators.forEach(function(sim) {
+        if (sim == simulator) {
+            mark_button(sim, coords[sim].ids, true);
+        } else {
+            mark_button(sim, coords[sim].ids, false);
+        }
+    });
+}
+
+function mark_button(simulator, svg_ids, active) {
+    sim_button = document.getElementById(simulator);
+    if (active) {
+        sim_button.setAttribute("class", "xkcd-script active");
+    } else {
+        sim_button.setAttribute("class", "xkcd-script");
+    }
+    const opacity = active ? 1.0 : 0.2;
+    svg_ids.forEach(function (id) {
+        for (child of document.getElementById(id).children) {
+            if (child.getAttribute("stroke") != "transparent")
+                child.setAttribute("stroke-opacity", opacity);
+        }
+    });
 }
 
 function reset_buttons() {
@@ -201,10 +217,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
             pt.x = x;
             pt.y = y;
             const svgP = pt.matrixTransform( svg.getScreenCTM().inverse() );
-            mark_buttons(svgP.x, svgP.y, all_coords);
+            on_graph_hover(svgP.x, svgP.y, all_coords);
         });
         svg.addEventListener("mouseleave", function(e) {
             reset_buttons();
+        });
+        simulators.forEach(function(simulator) {
+            document.getElementById(simulator).addEventListener("mouseenter", function(e) {
+                on_button_hover(simulator, all_coords);
+            });
+            document.getElementById(simulator).addEventListener("mouseleave", function(e) {
+                reset_buttons();
+            });
         });
     });
 });
