@@ -5,7 +5,7 @@ const bio_levels = ["Population Model", "Single-Compartment (Simple) Model",
 const comp_levels = ["GPU", "Single Machine", "Cluster", "Supercomputer"];
 const colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00'];
 
-const width = 1024;
+const width = 1200;
 const colsize = (width - 150) / (bio_levels.length + 1);
 const height = 600;
 const rowsize = (height - bio_levels.length*20) / (comp_levels.length + 1);
@@ -97,7 +97,6 @@ function draw_rectangle(sim_idx, coords, svg, rc) {
 }
 
 function mark_buttons(x, y, coords) {
-    console.log(x, y);
     if (x < 0.5*colsize/2 || x > (bio_levels.length + 0.5)*colsize || y < 0.5*rowsize/2 || y > (comp_levels.length + 0.5)*rowsize) {
         reset_buttons();
         return;
@@ -123,10 +122,11 @@ function mark_buttons(x, y, coords) {
             stroke_width = 2;
             sim_button.setAttribute("class","xkcd-script");
         }
+        const alpha = fits ? 1.0 : 0.2;
         svg_ids.forEach(function(id) {
             for (child of document.getElementById(id).children) {
-               if (parseFloat(child.getAttribute("stroke-width")) > 1)
-                 child.setAttribute("stroke-width", stroke_width);
+                 if (child.getAttribute("stroke") != "transparent")
+                    child.setAttribute("stroke-opacity", alpha);
             }
         });
     }
