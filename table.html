@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Simselect playground</title>
+        <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+        <script src="https://unpkg.com/roughjs@latest/bundled/rough.js"></script>
+        <script src="table.js"></script>
+        <style>
+            body {
+                transform: scale(1.5); 
+                transform-origin: 0 0;
+            }
+            @font-face {
+                font-family: xkcd-script;
+                src: url('https://cdn.jsdelivr.net/gh/ipython/xkcd-font@master/xkcd-script/font/xkcd-script.woff') format('woff');
+            }
+            .xkcd-script {
+                font-family: xkcd-script;
+                font-size: 150%;
+            }
+            button.simulator {
+                margin-right: 1em;
+                border: 0px;
+            }
+            button.active {
+                box-shadow: 0 -10px 0 gray inset
+            }
+            table {
+                border-collapse: collapse;
+                overflow-x: visible;
+                border: 0;
+            }
+            thead.simulator_table {
+                background-color: var(--color-bg);
+                color: var(--color-text);
+            }
+            th {
+                text-align: right ;
+            }
+            td.has_feature:after {
+                content: "🗹";
+            }
+
+            td.match:after {
+                content: "🗹";
+                font-weight: bold;
+                color: darkgreen;
+            }
+
+            .mismatch:after {
+                content: "✗";
+                font-weight: bold;
+                color: darkred;
+            }
+            .header_space {
+                height: 200px;
+                position: relative;
+            }
+            .header {
+                bottom: 5px ;
+                left: 50% ;
+                position: absolute ;
+                transform: rotate( -30deg ) ;
+                transform-origin: center left ;
+                white-space: nowrap ;
+            }
+            .header:hover {
+                color: darkblue;
+            }
+        </style>
+    </head>
+    <body>
+    <h1>Simselect playground (table view)</h1>
+    <div id="table"></div>
+    </body>
+</html>
