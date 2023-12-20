@@ -66,20 +66,28 @@ function update_table() {
     let rows = [];
     for (const [simulator, sim_description] of Object.entries(sim_descriptions)) {
         let matches = 0;
-        let row = `<tr><th scope="row" class='simulator_name'>${simulator}</td>`;
+        let cells = [];
         bio_levels.forEach(bio_level => {
             const cell_class = get_cell_class(criteria, bio_level, sim_description["biological_level"]);
             if (cell_class == "match")
                 matches++;
-            row += `<td class=${cell_class}></td>`;
+            cells.push(`<td class=${cell_class}></td>`);
         })
         comp_levels.forEach(comp_level => {
             const cell_class = get_cell_class(criteria, comp_level, sim_description["computing_scale"]);
             if (cell_class == "match")
                 matches++;
-            row += `<td class=${cell_class}></td>`;
+            cells.push(`<td class=${cell_class}></td>`);
         })
-        row += "</tr>"
+        if (criteria.length == 0)
+            match_class = "";
+        else if (criteria.length == matches)
+            match_class = "good_match";
+        else if (matches > 0)
+            match_class = "medium_match";
+        else
+            match_class = "bad_match"
+        const row = `<tr class="simulator_row ${match_class}"><th scope="row" class='simulator_name'>${simulator}</td>` + cells.join(" ") + "</tr>";
         rows.push({row: row, matches: matches});
     }
     rows.sort((a, b) => b['matches']-a['matches'])

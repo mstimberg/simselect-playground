@@ -41,6 +41,18 @@
                 content: "🗹";
             }
 
+            table tr.simulator_row {
+                background-color: var(--color-bg);
+            }
+            table tr.simulator_row.good_match {
+                background: rgba(12, 12, 200, .4);
+            }
+            table tr.simulator_row.medium_match {
+                background: rgba(12, 12, 200, .2);
+            }
+            table tr.simulator_row.bad_match {
+                background: rgba(12, 12, 200, .1);
+            }
             td.match:after {
                 content: "🗹";
                 font-weight: bold;
